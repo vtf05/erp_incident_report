@@ -43,17 +43,17 @@ graph TD
 4. **Triage Dashboard**: The `IncidentTable` fetches enriched data, providing P1 alerts and filtered views.
 5. **Status Management**: Support agents update incident status (e.g., from `New` to `In Progress`) via the detailed view.
 
-## Assumptions Made
 
-1. **Redis Availability**: It is assumed a Redis instance is running on `localhost:6379` to support the admin panel's session management.
-2. **Module Scope**: The system currently assumes ERP modules are standard (AP, AR, GL, etc.), as reflected in the hardcoded enums.
-3. **Python Version**: Development was performed on Python 3.13. Compatibility patches for `distutils` and `aioredis` were implemented to support this specific version.
-4. **Local Auth**: Default superuser credentials (`admin`/`adminpassword`) are used for the initial setup.
+### Non-Technical (Business) Assumptions
+1. **Standardized Environments**: The portal assumes a dual-environment landscape (Production vs. Test) is sufficient for all business units.
+2. **Manual Verification**: While the rule engine automates primary triage (severity/category), it is assumed that a human agent performs the final verification and status transition.
+3. **Centralized Governance**: The design assumes a centralized triage model where a single dashboard serves multiple business units globally.
+4. **Data Accuracy**: It is assumed that the incident description provided by the user contains sufficient descriptive tokens (keywords) for the rule engine to act upon.
 
 ## Future Improvements & Extensions
 
 - **WebSockets**: Implement real-time dashboard updates when new incidents are enriched.
 - **Audit Logs**: Track every change made to an incident (who changed status, when, etc.).
-- **Advanced Rules**: Integrate a more complex expression evaluator (e.g., regex-based keyword matching).
+- **Advanced Rules**: Integrate a more complex expression evaluator (e.g.,Rag basaed LLM systems that can help making the rules more dynamic ).
 - **Custom Admin**: Migrate from `fastapi-admin` to a custom-built React admin if specific complex UI workflows are required.
 - **Reporting**: Add an analytics layer to visualize incident volume by module/severity over time.

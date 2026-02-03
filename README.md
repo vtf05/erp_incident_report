@@ -1,9 +1,9 @@
-# ERP Incident Triage Portal
+# ERP Incident Report Portal
 
 A full-stack application for monitoring, managing, and automatically enriching ERP system incidents.
 
 ## Features
-- **Automated Triage**: Incidents are automatically categorized and prioritized based on configurable rules.
+- **Automated Report**: Incidents are automatically categorized and prioritized based on configurable rules.
 - **Dashboard**: High-level stats and filtered incident views.
 - **Detailed Inquiry**: Deep-dive into case metadata and enrichment summaries.
 - **Admin Panel**: Manage users, rules, and incidents via a Django-inspired interface.
