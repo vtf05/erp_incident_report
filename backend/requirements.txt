@@ -1,0 +1,13 @@
+fastapi
+uvicorn[standard]
+tortoise-orm
+aerich
+fastapi-admin
+passlib[bcrypt]
+python-jose[cryptography]
+pydantic-settings
+aiosqlite
+jinja2
+python-multipart
+# For enrichment logic if needed
+pyyaml
