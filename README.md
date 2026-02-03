@@ -35,7 +35,6 @@ Run the API:
 uvicorn app.main:app --reload
 ```
 - API Docs: [http://localhost:8000/docs](http://localhost:8000/docs)
-- Admin Panel: [http://localhost:8000/admin](http://localhost:8000/admin)
 
 ### 2. Frontend Setup
 Navigate to the `frontend` directory and install dependencies:
