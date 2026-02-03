@@ -2,6 +2,7 @@
 
 A full-stack application for monitoring, managing, and automatically enriching ERP system incidents.
 
+
 ## Features
 - **Automated Report**: Incidents are automatically categorized and prioritized based on configurable rules.
 - **Dashboard**: High-level stats and filtered incident views.
@@ -54,6 +55,21 @@ npm run dev
 - **/frontend**: React application with Vite, using vanilla CSS for aesthetics.
 - **DESIGN.md**: Detailed architecture, technology rationale, and flow diagrams.
 
-## Quick Start (Initial Admin Account)
-- **Username**: `admin`
-- **Password**: `adminpassword`
+
+## AWS Implementation Status (Infrastructure Note)
+
+> [!IMPORTANT]
+> AWS services were not utilized in this MVP due to development account limitations.
+
+For a production-grade deployment of this platform, the following AWS architecture is recommended:
+
+- **Networking**:
+  - **VPC** with Public and Private Subnets.
+  - **Application Load Balancer (ALB)** for secure traffic routing.
+- **Compute**:
+  - **AWS Fargate** or **ECS** for scalable container orchestration.
+- **Storage & Databases**:
+  - **Amazon RDS (PostgreSQL)**: Preferred for structured incident data and relational integrity.
+  - **Amazon S3**: To store enrichment logs and raw incident payloads.
+- **Monitoring**:
+  - **Amazon CloudWatch**: For centralized logging, metrics, and incident tracing.

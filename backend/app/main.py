@@ -1,4 +1,11 @@
+# Monkeypatch distutils for Python 3.13 compatibility with aioredis
 import sys
+import types
+distutils = types.ModuleType("distutils")
+distutils.util = types.ModuleType("distutils.util")
+distutils.util.strtobool = lambda val: val.lower() in ("y", "yes", "t", "true", "on", "1")
+sys.modules["distutils"] = distutils
+sys.modules["distutils.util"] = distutils.util
 
 from fastapi import FastAPI
 from starlette.middleware.cors import CORSMiddleware
@@ -12,8 +19,14 @@ async def lifespan(app: FastAPI):
     # Startup: Initialize database
     await init_db()
     
-    # Initialize Admin   # ty:ignore[unresolved-import]
-    # app.mount("/admin", admin_app)
+    # Initialize Admin
+    try:
+        from app.admin.setup import setup_admin
+        from fastapi_admin.app import app as admin_app
+        await setup_admin(app)
+        app.mount("/admin", admin_app)
+    except Exception as e:
+        print(f"Error initializing admin: {e}")
     
     yield
     
