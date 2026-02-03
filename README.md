@@ -59,7 +59,7 @@ npm run dev
 ## AWS Implementation Status (Infrastructure Note)
 
 > [!IMPORTANT]
-> AWS services were not utilized in this MVP due to development account limitations.
+> AWS services were not utilized in this MVP because i do not have free tier available have exhausted all the limits already.
 
 For a production-grade deployment of this platform, the following AWS architecture is recommended:
 
