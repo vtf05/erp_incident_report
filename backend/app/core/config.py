@@ -13,6 +13,10 @@ class Settings(BaseSettings):
     SECRET_KEY: str = "your-secret-key-here"  # In production, use a secure secret key
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
+    AWS_ACCESS_KEY_ID: str = "AKIAS7B7SP43YZA7VY6Q"
+    AWS_SECRET_ACCESS_KEY: str = "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"
+    AWS_REGION: str = "ap-south-1"
+    S3_BUCKET_NAME: str = "avi-test-buck"
     
     # Enrichment App
     ENRICHMENT_APP_ACTIVE: bool = True

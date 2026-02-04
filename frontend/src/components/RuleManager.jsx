@@ -5,12 +5,16 @@ import { enrichmentService } from '../services/api';
 const RuleManager = () => {
   const [rules, setRules] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [showAddForm, setShowAddForm] = useState(false);
+  const [editingRule, setEditingRule] = useState(null);
+  const [showForm, setShowForm] = useState(false);
   const [newRule, setNewRule] = useState({
     name: '',
     erp_module_condition: '',
     keyword_condition: '',
     severity_outcome: 'P2',
+    category_outcome: '',
+    summary_template: '',
+    suggested_action_outcome: '',
     priority: 0
   });
 
@@ -30,15 +34,50 @@ const RuleManager = () => {
     fetchRules();
   }, []);
 
-  const handleAddRule = async (e) => {
+  const handleSaveRule = async (e) => {
     e.preventDefault();
     try {
-      await enrichmentService.createRule(newRule);
-      setShowAddForm(false);
+      if (editingRule?.id) {
+        await enrichmentService.updateRule(editingRule.id, newRule);
+      } else {
+        await enrichmentService.createRule(newRule);
+      }
+      setShowForm(false);
+      setEditingRule(null);
       fetchRules();
-      setNewRule({ name: '', erp_module_condition: '', keyword_condition: '', severity_outcome: 'P2', priority: 0 });
+      resetForm();
     } catch (err) {
-      alert('Failed to create rule');
+      alert(`Failed to ${editingRule?.id ? 'update' : 'create'} rule`);
+    }
+  };
+
+  const resetForm = () => {
+    setNewRule({ 
+      name: '', 
+      erp_module_condition: '', 
+      keyword_condition: '', 
+      severity_outcome: 'P2', 
+      category_outcome: '',
+      summary_template: '',
+      suggested_action_outcome: '',
+      priority: 0 
+    });
+  };
+
+  const startEdit = (rule) => {
+    setEditingRule(rule);
+    setNewRule(rule);
+    setShowForm(true);
+  };
+
+  const handleDeleteRule = async (id) => {
+    if (!window.confirm('Are you sure you want to delete this rule?')) return;
+    try {
+      await enrichmentService.deleteRule(id);
+      fetchRules();
+    } catch (err) {
+      console.error('Failed to delete rule:', err);
+      alert('Failed to delete rule');
     }
   };
 
@@ -50,7 +89,11 @@ const RuleManager = () => {
           <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>Rules are executed in order of priority (descending).</p>
         </div>
         <button 
-          onClick={() => setShowAddForm(!showAddForm)}
+          onClick={() => {
+            setEditingRule(null);
+            resetForm();
+            setShowForm(!showForm);
+          }}
           className="btn-primary" 
           style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.6rem 1.2rem' }}
         >
@@ -58,10 +101,10 @@ const RuleManager = () => {
         </button>
       </div>
 
-      {showAddForm && (
+      {showForm && (
         <div className="glass-card animate-fade-in" style={{ background: 'rgba(255, 255, 255, 0.03)' }}>
-          <h4 style={{ marginBottom: '1.25rem' }}>Create New Enrichment Rule</h4>
-          <form onSubmit={handleAddRule} style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '1.5rem' }}>
+          <h4 style={{ marginBottom: '1.25rem' }}>{editingRule ? 'Edit' : 'Create New'} Enrichment Rule</h4>
+          <form onSubmit={handleSaveRule} style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '1.5rem' }}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', gridColumn: 'span 2' }}>
               <label style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>RULE NAME</label>
               <input 
@@ -96,6 +139,36 @@ const RuleManager = () => {
                 <option value="P3">P3 - Medium</option>
               </select>
             </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+              <label style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>CATEGORY OUTCOME</label>
+              <input 
+                className="glass"
+                style={{ padding: '0.75rem', borderRadius: '8px', color: 'white', outline: 'none' }}
+                placeholder="e.g. Integration Failure"
+                value={newRule.category_outcome}
+                onChange={e => setNewRule({...newRule, category_outcome: e.target.value})}
+              />
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', gridColumn: 'span 2' }}>
+              <label style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>SUMMARY TEMPLATE (use {`{title}, {module}, {env}, {unit}`})</label>
+              <input 
+                className="glass"
+                style={{ padding: '0.75rem', borderRadius: '8px', color: 'white', outline: 'none' }}
+                placeholder="e.g. Critical {module} error in {env}: {title}"
+                value={newRule.summary_template}
+                onChange={e => setNewRule({...newRule, summary_template: e.target.value})}
+              />
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', gridColumn: 'span 2' }}>
+              <label style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>SUGGESTED ACTION</label>
+              <textarea 
+                className="glass"
+                style={{ padding: '0.75rem', borderRadius: '8px', color: 'white', outline: 'none', minHeight: '80px', resize: 'vertical' }}
+                placeholder="e.g. Restart the integration service and check logs."
+                value={newRule.suggested_action_outcome}
+                onChange={e => setNewRule({...newRule, suggested_action_outcome: e.target.value})}
+              />
+            </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', gridColumn: 'span 2' }}>
               <label style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>KEYWORD MATCH (DESCRIPTION)</label>
               <input 
@@ -107,7 +180,7 @@ const RuleManager = () => {
               />
             </div>
             <div style={{ gridColumn: 'span 2', display: 'flex', gap: '1rem', justifyContent: 'flex-end', marginTop: '0.5rem' }}>
-              <button type="button" onClick={() => setShowAddForm(false)} className="glass" style={{ padding: '0.6rem 1.2rem' }}>Cancel</button>
+              <button type="button" onClick={() => { setShowForm(false); setEditingRule(null); resetForm(); }} className="glass" style={{ padding: '0.6rem 1.2rem' }}>Cancel</button>
               <button type="submit" className="btn-primary" style={{ padding: '0.6rem 1.2rem' }}>Save Rule</button>
             </div>
           </form>
@@ -136,7 +209,22 @@ const RuleManager = () => {
             <div style={{ display: 'flex', gap: '0.5rem' }}>
                <button className="glass" style={{ padding: '0.5rem' }}><ArrowUp size={16} /></button>
                <button className="glass" style={{ padding: '0.5rem' }}><ArrowDown size={16} /></button>
-               <button className="glass" style={{ padding: '0.5rem', color: 'var(--status-critical)' }}><Trash2 size={16} /></button>
+               <button 
+                onClick={() => startEdit(rule)}
+                className="glass" 
+                style={{ padding: '0.5rem', color: 'var(--brand-primary)' }}
+                title="Edit Rule"
+               >
+                <Settings size={16} />
+               </button>
+               <button 
+                onClick={() => handleDeleteRule(rule.id)}
+                className="glass" 
+                style={{ padding: '0.5rem', color: 'var(--status-critical)' }}
+                title="Delete Rule"
+               >
+                <Trash2 size={16} />
+               </button>
             </div>
           </div>
         ))}

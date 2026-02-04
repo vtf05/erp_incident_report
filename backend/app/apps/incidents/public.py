@@ -3,6 +3,8 @@ from fastapi import HTTPException
 from .models import Incident
 from .schemas import IncidentCreate, IncidentUpdate
 from app.apps.enrichment.services import enrichment_service
+from app.core.aws import s3_service
+from datetime import datetime
 
 class IncidentService:
     @staticmethod
@@ -13,6 +15,14 @@ class IncidentService:
         incident = await Incident.create(**incident_in.model_dump())
         await enrichment_service.enrich_incident(incident)
         await incident.save()
+        
+        # Upload to S3
+        s3_service.upload_payload(
+            folder="incidents",
+            filename=f"incident_{incident.id}_{datetime.now().strftime('%Y%m%d_%H%M%S')}",
+            payload=incident_in.model_dump()
+        )
+        
         return incident
 
     @staticmethod

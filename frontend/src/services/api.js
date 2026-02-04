@@ -32,6 +32,18 @@ export const incidentService = {
     });
     if (!response.ok) throw new Error('Failed to update incident');
     return response.json();
+  },
+
+  listS3Payloads: async (prefix = "") => {
+    const response = await fetch(`${API_BASE}/aws/payloads?prefix=${prefix}`);
+    if (!response.ok) throw new Error('Failed to fetch S3 payloads');
+    return response.json();
+  },
+
+  getS3Payload: async (key) => {
+    const response = await fetch(`${API_BASE}/aws/payloads/${key}`);
+    if (!response.ok) throw new Error('Failed to fetch S3 payload content');
+    return response.json();
   }
 };
 
@@ -49,6 +61,24 @@ export const enrichmentService = {
       body: JSON.stringify(ruleData),
     });
     if (!response.ok) throw new Error('Failed to create rule');
+    return response.json();
+  },
+
+  deleteRule: async (id) => {
+    const response = await fetch(`${API_BASE}/enrichment/rules/${id}`, {
+      method: 'DELETE',
+    });
+    if (!response.ok) throw new Error('Failed to delete rule');
+    return response.json();
+  },
+
+  updateRule: async (id, ruleData) => {
+    const response = await fetch(`${API_BASE}/enrichment/rules/${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(ruleData),
+    });
+    if (!response.ok) throw new Error('Failed to update rule');
     return response.json();
   }
 };

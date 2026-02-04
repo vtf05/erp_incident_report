@@ -11,3 +11,4 @@ jinja2
 python-multipart
 # For enrichment logic if needed
 pyyaml
+boto3

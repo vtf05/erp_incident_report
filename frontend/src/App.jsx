@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { LayoutDashboard, ShieldAlert, Settings, PlusCircle, Bell, RefreshCw } from 'lucide-react';
+import { LayoutDashboard, ShieldAlert, Settings, PlusCircle, Bell, RefreshCw, HardDrive } from 'lucide-react';
 import { incidentService } from './services/api';
 import IncidentTable from './components/IncidentTable';
 import IncidentForm from './components/IncidentForm';
 import RuleManager from './components/RuleManager';
 import IncidentDetails from './components/IncidentDetails';
+import S3Explorer from './components/S3Explorer';
 
 const Layout = ({ children, activeTab, setActiveTab, onReset }) => {
   return (
@@ -34,6 +35,12 @@ const Layout = ({ children, activeTab, setActiveTab, onReset }) => {
           >
             <Settings size={20} /> Enrichment Rules
           </button>
+          <button 
+            onClick={() => setActiveTab('s3')}
+            className={`nav-item ${activeTab === 's3' ? 'active' : ''}`}
+          >
+            <HardDrive size={20} /> S3 Payload Explorer
+          </button>
         </nav>
 
         <div style={{ marginTop: 'auto' }}>
@@ -56,12 +63,14 @@ const Layout = ({ children, activeTab, setActiveTab, onReset }) => {
               {activeTab === 'details' && 'Incident Details'}
               {activeTab === 'rules' && 'Enrichment Rules'}
               {activeTab === 'create' && 'Report New Incident'}
+              {activeTab === 's3' && 'S3 Payload Explorer'}
             </h1>
             <p style={{ color: 'var(--text-secondary)' }}>
               {activeTab === 'dashboard' && 'Monitor and triage ERP system incidents in real-time.'}
               {activeTab === 'details' && 'View detailed analysis and enrichment data.'}
               {activeTab === 'rules' && 'Manage auto-enrichment logic and prioritization.'}
               {activeTab === 'create' && 'Fill out the details to automatically triage the issue.'}
+              {activeTab === 's3' && 'Explore raw incident and rule payloads stored in Amazon S3.'}
             </p>
           </div>
           <div className="flex-center" style={{ gap: '1.5rem' }}>
@@ -212,6 +221,10 @@ function App() {
 
       {activeTab === 'rules' && (
         <RuleManager />
+      )}
+
+      {activeTab === 's3' && (
+        <S3Explorer />
       )}
 
       {activeTab === 'create' && (
